@@ -1,19 +1,57 @@
+import subprocess
+import sys
+from PyQt5.QtCore import QTimer
+from PyQt5.QtWidgets import QApplication, QMainWindow, QLabel
+
+# List of packages to install
+required_packages = ['requests', 'pyqt5']
+
+# Check if a package is already installed
+def is_package_installed(package):
+    return package in sys.modules
+
+# Install required packages
+def install_packages(packages):
+    for package in packages:
+        if not is_package_installed(package):
+            subprocess.check_call([sys.executable, '-m', 'pip', 'install', package])
+
+# Install required packages automatically
+install_packages(required_packages)
+
 import requests
-import datetime as dt
-t = dt.datetime.now()
+from PyQt5.QtWidgets import QApplication, QMainWindow, QLabel
+
 def get_price(symbol):
-    url = 'https://api.binance.com/api/v1/ticker/price' #Binance API
+    url = 'https://api.binance.com/api/v3/ticker/price'
     params = {
-        'symbol': symbol        
+        'symbol': symbol
     }
     response = requests.get(url, params=params)
-    data = response.json()  
+    data = response.json()
     return data['price']
 
-while True:
-    delta = dt.datetime.now()-t
-    if delta.seconds >= 3: #3 second interval
-        print('BTC:'+get_price('BTCUSDT'))
-        print('ETH:'+get_price('ETHUSDT'))
-        print('------------------')
-        t = dt.datetime.now()         
+class MainWindow(QMainWindow):
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle("Crypto Prices")
+        self.label = QLabel(self)
+        font = self.label.font()
+        font.setPointSize(font.pointSize() + 4)  # Set the font size
+        self.label.setFont(font)
+        self.setCentralWidget(self.label)
+        self.timer = QTimer(self)
+        self.timer.timeout.connect(self.fetch_and_display_prices)
+        self.timer.start(1000)  # Update every second (1000 milliseconds)
+
+    def fetch_and_display_prices(self):
+        btc_price = get_price('BTCUSDT')
+        eth_price = get_price('ETHUSDT')
+        self.label.setText(f'BTC: {btc_price}\nETH: {eth_price}')
+
+if __name__ == "__main__":
+    app = QApplication(sys.argv)
+    window = MainWindow()
+    window.setGeometry(100, 100, 250, 150)
+    window.show()
+    sys.exit(app.exec_())
