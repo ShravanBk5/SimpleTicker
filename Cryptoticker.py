@@ -1,5 +1,6 @@
 import subprocess
 import sys
+# PyQt5 looks better than Tkinter
 from PyQt5.QtCore import QTimer
 from PyQt5.QtWidgets import QApplication, QMainWindow, QLabel
 
