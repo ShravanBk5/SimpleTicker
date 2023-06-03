@@ -3,7 +3,7 @@ import sys
 from PyQt5.QtCore import QTimer
 from PyQt5.QtWidgets import QApplication, QMainWindow, QLabel
 
-# List of packages to install
+# Packages to install
 required_packages = ['requests', 'pyqt5']
 
 # Check if a package is already installed
